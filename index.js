@@ -105,6 +105,39 @@ app.delete('/game/:id',(req, res)=>{
 })
 
 
+app.put('/game/:id',(req, res)=>{
+
+    var id = req.params.id
+    if( isNaN(id)){
+        res.statusCode = 400
+
+    }else{
+        var game = db.games.find( game => game.id == id)
+        console.log(" game q foi encontrado "+ game.title)
+        if(game.id != undefined){
+            var { title, year, price} = req.body
+
+            if(title != undefined){
+                game.title = title
+            }
+            if(year != undefined){
+                game.year = year
+            }
+
+            if(price != undefined){
+                game.price = price
+            }
+            res.statusCode= 200
+
+        }else{
+            res.statusCode= 400
+        }
+    }
+})
+
+
+
+
 
 
 
