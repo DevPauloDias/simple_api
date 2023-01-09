@@ -15,14 +15,27 @@
 
     <h4> Novo game</h4>
     <div>
-        <input type="text" id="title" name="title" placeholder="titulo">
+        <input type="text" id="title" name="id" >
         <input type="text" id="year" name="year" placeholder="ano">
         <input type="text" id="price" name="preco" placeholder="preço">
         <button type="button" onclick="createGame()">Criar</button>
     </div>
+    <hr>
+
+    <h4> Editar game</h4>
+    <div>
+        <input type="text" id="idEdit" name="idEdit" placeholder="ID" readonly>
+        <input type="text" id="titleEdit" name="titleEdit" placeholder="titulo">
+        <input type="text" id="yearEdit" name="yearEdit" placeholder="ano">
+        <input type="text" id="priceEdit" name="precoEdit" placeholder="preço">
+        <button type="button" onclick="updateGame()">Editar</button>
+    </div>
     
 </body>
 <script src="https://cdn.jsdelivr.net/npm/axios@1.1.2/dist/axios.min.js"></script>
+
+
+
 <script>
     axios.get('http://localhost:3333/games').then( response =>{
         
@@ -31,17 +44,40 @@
 
         games.forEach(game => {
             var item = document.createElement('li')
+            item.setAttribute('data-id', game.id)
+            item.setAttribute('data-title', game.title)
+            item.setAttribute('data-year', game.year)
+            item.setAttribute('data-price', game.price)
+
             item.innerHTML = game.id + '- '+ game.title +' - $'+ game.price
+
+            var deleteBtn = document.createElement('button')            
+            deleteBtn.innerHTML = "Deletar"            
+            deleteBtn.addEventListener('click',()=>{deleteGame(item)})
+           
+
+            var editeBtn = document.createElement('button')
+            editeBtn.innerHTML = "Editar"
+            editeBtn.addEventListener('click',()=>{loadFormEdit(item)})
+
+            item.appendChild(deleteBtn)
+            item.appendChild(editeBtn)
+
             list.appendChild(item)
             
         });
 
     }).catch( err =>{
         console.log('falha ao consumir a api - '+ err)
-    })
+    })  
+
+    
 </script>
+
+
 <script>
-  function createGame(){
+
+function createGame(){
     var inputTitle= document.getElementById('title')
     var inputYear= document.getElementById('year')
     var inputPrice= document.getElementById('price')
@@ -61,7 +97,69 @@
     }).catch(err =>{
         console.log(err)
     })
+    location.reload()
   }
+
+// -------------------------------------------------------------------------
+
+    function deleteGame (listItem){
+        var id = listItem.getAttribute('data-id')
+        console.log(id)
+        axios.delete(`http://localhost:3333/game/${id}`).then(()=>{
+            alert('Game deletado!')
+        }).catch(err =>{
+            console.log(err)
+        })
+        location.reload()
+
+    }
+// -------------------------------------------------------------------------
+
+    function loadFormEdit(listItem){
+
+      var id = listItem.getAttribute('data-id')
+      var title = listItem.getAttribute('data-title')
+      var year = listItem.getAttribute('data-year')
+      var price = listItem.getAttribute('data-price')
+
+      document.getElementById('idEdit').value = id         
+      document.getElementById('titleEdit').value = title
+      document.getElementById('yearEdit').value = year
+      document.getElementById('priceEdit').value = price    
+
+    }
+// -------------------------------------------------------------------------
+ function updateGame (){
+    
+    var id = document.getElementById('idEdit').value
+    var title= document.getElementById('titleEdit').value
+    var year= document.getElementById('yearEdit').value
+    var price= document.getElementById('priceEdit').value
+   
+    console.log(id)
+
+
+    //gambiarra a seguir
+    // Se eu mandar m campo em branco para edição, não seria pra esse campo ser atualizado no objeto... porém ele insere esse campo vazio
+
+    var game ={
+        'title': title,
+        'year': year,
+        'price': price
+    }
+    
+    axios.put('http://localhost:3333/game/' + id, game).then(()=>{
+        alert('Game atualizado com sucesso')
+
+        location.reload()
+    }).catch(err =>{
+        alert('não foi possível atualizar o game - '+ err)
+    })
+
+ }
+
+    
 </script>
+
 
 </html>

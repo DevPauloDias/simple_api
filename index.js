@@ -38,7 +38,7 @@ app.get('/games',(req, res)=>{
     res.json(db.games)
 })
 
-app.get('/games/:id',(req, res)=>{
+app.get('/game/:id',(req, res)=>{
     var id = req.params.id
 
     if(isNaN(id)){
@@ -127,17 +127,18 @@ app.put('/game/:id',(req, res)=>{
     }else{
         var game = db.games.find( game => game.id == id)
         console.log(" game q foi encontrado "+ game.title)
+
         if(game.id != undefined){
             var { title, year, price} = req.body
 
-            if(title != undefined){
+            if(title != undefined && title != ""){
                 game.title = title
             }
-            if(year != undefined){
+            if(year != undefined && year != ""){
                 game.year = year
             }
 
-            if(price != undefined){
+            if(price != undefined && price != ""){
                 game.price = price
             }
             res.statusCode = 200
