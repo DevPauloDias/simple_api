@@ -1,6 +1,9 @@
 const express = require('express')
 const app = express()
 const bodyParser = require('body-parser')
+const cors = require('cors')
+
+app.use(cors())
 
 
 app.use(bodyParser.urlencoded({extended: false}))
@@ -49,7 +52,7 @@ app.get('/games/:id',(req, res)=>{
             res.json(game)
         }else{
             res.statusCode = 404;
-            res.send('objeto não encontrado')
+            res.send()
         }
         
 
@@ -61,10 +64,12 @@ app.get('/games/:id',(req, res)=>{
 app.post('/game',(req, res)=>{
     
 
-    var { id,title, year, price} = req.body
+    var { title, year, price} = req.body
+    var id = 40
 
     if(title != undefined && year != undefined && price != undefined){
         res.statusCode = 200
+        res.send('Game criado')
 
         db.games.push({
             id,
@@ -73,9 +78,12 @@ app.post('/game',(req, res)=>{
             price
     
         })
-        res.statusCode = 200
+        
+       
     }else{
+        console.log('não cadastrou, campos incompletos')
         res.statusCode = 400
+        res.send()
     }
 
     
@@ -87,6 +95,7 @@ app.delete('/game/:id',(req, res)=>{
     var id = req.params.id
     if( isNaN(id)){
         res.statusCode = 400
+        res.send()
 
     }else{
         var game = db.games.find( game => game.id == id)
@@ -98,8 +107,10 @@ app.delete('/game/:id',(req, res)=>{
             db.games.splice(gameIndex,1)
 
             res.statusCode = 200
+            res.send()
         }else{
             res.statusCode= 400
+            res.send()
         }
     }
 })
@@ -110,6 +121,8 @@ app.put('/game/:id',(req, res)=>{
     var id = req.params.id
     if( isNaN(id)){
         res.statusCode = 400
+        res.send()       
+
 
     }else{
         var game = db.games.find( game => game.id == id)
@@ -127,10 +140,12 @@ app.put('/game/:id',(req, res)=>{
             if(price != undefined){
                 game.price = price
             }
-            res.statusCode= 200
+            res.statusCode = 200
+            res.send('ok')
 
         }else{
-            res.statusCode= 400
+            res.statusCode = 400
+            res.send()
         }
     }
 })
