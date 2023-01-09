@@ -14,6 +14,38 @@ app.use(cors())
 app.use(bodyParser.urlencoded({extended: false}))
 app.use(bodyParser.json())
 
+function auth(req, res, next){
+    const authToken = req.headers['authorization'];
+
+    if(authToken != undefined){
+        var bearer = authToken.split(' ')
+        var token = bearer[1];
+       
+        jwt.verify(token, jwtSecret,(err, data)=>{
+            if(err){
+                res.status(401);
+                res.json({ err: 'Token inválido!'})
+            }else{
+               
+                req.token = token;
+                req.loggedUser = { id: data.id, email: data.email}
+                res.status(200)
+                next()
+            }
+
+        })        
+        
+
+    }else{
+        res.status(401)
+        res.json({ err: 'Token inválido!'})
+    }
+
+
+    
+
+}
+
 
 var db ={
     games: [
@@ -31,7 +63,7 @@ var db ={
         },
         {
             id: 21,
-            title: 'naturo',
+            title: 'Naruto',
             year: 2019,
             price: 60
         }
@@ -54,9 +86,10 @@ var db ={
 
 // Rotas games -------------------------------------------------------------
 
-app.get('/games',(req, res)=>{
+app.get('/games',auth,(req, res)=>{
+
     res.statusCode = 200;
-    res.json(db.games)
+    res.json({ user: req.loggedUser, games: db.games})
 })
 
 app.get('/game/:id',(req, res)=>{
@@ -192,19 +225,13 @@ app.post('/auth', (req, res)=>{
 
                     }
                 })
-
-
-
-
                 
             }else{
                 console.log(' Usuário não encontrado')
                 res.status(401)
                 res.json({err: "credenciais inválidas"})
             }
-
         }
-
 
     }else{
         res.status(400) 
