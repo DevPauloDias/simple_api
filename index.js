@@ -89,7 +89,7 @@ var db ={
 app.get('/games',auth,(req, res)=>{
 
     res.statusCode = 200;
-    res.json({ user: req.loggedUser, games: db.games})
+    res.json(db.games)
 })
 
 app.get('/game/:id',(req, res)=>{
@@ -115,7 +115,7 @@ app.get('/game/:id',(req, res)=>{
    
 })
 
-app.post('/game',(req, res)=>{
+app.post('/game',auth,(req, res)=>{
     
 
     var { title, year, price} = req.body
@@ -239,14 +239,6 @@ app.post('/auth', (req, res)=>{
      }
 
 })
-
-
-
-
-
-
-
-
 
 
 app.listen(3333,()=>{
