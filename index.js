@@ -2,8 +2,13 @@ const express = require('express')
 const app = express()
 const bodyParser = require('body-parser')
 const cors = require('cors')
+const jwt = require('jsonwebtoken')
+
+
+const jwtSecret = "123654789"
 
 app.use(cors())
+
 
 
 app.use(bodyParser.urlencoded({extended: false}))
@@ -30,8 +35,24 @@ var db ={
             year: 2019,
             price: 60
         }
+    ],
+    users: [
+        {
+            id: 1,
+            name: "Paulo Dias",
+            email: "paulo@teste.com",
+            password: "123"
+        },
+        {
+            id: 2,
+            name: "Patrick",
+            email: "patrick@teste.com",
+            password: "123"
+        }
     ]
 }
+
+// Rotas games -------------------------------------------------------------
 
 app.get('/games',(req, res)=>{
     res.statusCode = 200;
@@ -149,6 +170,47 @@ app.put('/game/:id',(req, res)=>{
             res.send()
         }
     }
+})
+// ---------------------------------------------------
+// Rotas Usuarios
+
+app.post('/auth', (req, res)=>{
+    var {email, password} = req.body;
+
+    if(email != undefined && email!= "" && password!= undefined && password!= ""){
+
+        if(password != undefined && password != ""){
+           var user= db.users.find( user => user.email == email && user.password == password)
+            if(user!= undefined){
+                jwt.sign({ id: user.id, email: user.email}, jwtSecret, {expiresIn:"48h"},(err, token)=>{
+                    if(err){
+                        res.status(400)
+                        res.json({ err: 'falha interna'})
+                    }else{
+                        res.statusCode = 200
+                        res.json({token: token});
+
+                    }
+                })
+
+
+
+
+                
+            }else{
+                console.log(' Usuário não encontrado')
+                res.status(401)
+                res.json({err: "credenciais inválidas"})
+            }
+
+        }
+
+
+    }else{
+        res.status(400) 
+        res.json(' O email enviado é inválido')
+     }
+
 })
 
 
