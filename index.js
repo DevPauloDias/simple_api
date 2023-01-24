@@ -4,6 +4,8 @@ const bodyParser = require('body-parser')
 const cors = require('cors')
 const jwt = require('jsonwebtoken')
 
+app.use("/favicon.ico", express.static("./images/favicon.ico"))
+
 
 const jwtSecret = "123654789"
 
@@ -180,7 +182,6 @@ app.put('/game/:id',(req, res)=>{
 
     }else{
         var game = db.games.find( game => game.id == id)
-        console.log(" game q foi encontrado "+ game.title)
 
         if(game.id != undefined){
             var { title, year, price} = req.body
